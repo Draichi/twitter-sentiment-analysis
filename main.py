@@ -23,15 +23,13 @@ app.layout = html.Div(
 
 @app.callback(
     Output(
-        component_id = 'output',
+        component_id       = 'output',
         component_property = 'children'
     ),
-    [
-        Input(
-            component_id = 'input',
-            component_property = 'value'
-        )
-    ]
+    [Input(
+        component_id       = 'input',
+        component_property = 'value'
+    )]
 )
 def lucas(luc):
     return "input: {}".format(luc)
