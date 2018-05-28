@@ -5,34 +5,70 @@
 # find for "disable="
 #
 #
-from dash.dependencies import Input, Output
+from dash.dependencies import Event, Output
 import dash 
 import dash_core_components as dcc 
 import dash_html_components as html
+import plotly, random
+import plotly.graph_objs as go
+from collections import deque
 
-app = dash.Dash()
-app.layout = html.Div(
-    children = [
-        dcc.Input(
-            id = 'input',
-            value = 'escre lucas',
-            type = 'text'
-        ),
-        html.Div(id = 'output')
-    ])
+x = deque(maxlen=20)
+y = deque(maxlen=20)
+x.append(1)
+y.append(1)
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    dcc.Graph(
+        id = 'live-graph',
+        animate = True
+    ),
+    dcc.Interval(
+        id = 'graph-update',
+        interval = 10000
+    )
+])
 
 @app.callback(
     Output(
-        component_id       = 'output',
-        component_property = 'children'
+        'live-graph',
+        'figure'
     ),
-    [Input(
-        component_id       = 'input',
-        component_property = 'value'
-    )]
+    events = [Event('graph-update', 'interval')]
 )
-def lucas(luc):
-    return "input: {}".format(luc)
+def update():
+    global x
+    global y
+    x.append(x[-1]+1)
+    y.append(y[-1]+y[-1]*random.uniform(-0.1, 0.1))
+
+    data = go.Scatter(
+        x = list(x),
+        y = list(y),
+        name = 'scatter',
+        mode = 'lines+markers'
+    )
+
+    return {
+        'data': [data],
+        'layout': go.Layout(
+            xaxis = dict(
+                range = [
+                    min(x),
+                    max(x)
+                ]
+            ),
+            yaxis = dict(
+                range = [
+                    min(y),
+                    max(y)
+                ]
+            )
+        )
+    }
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
