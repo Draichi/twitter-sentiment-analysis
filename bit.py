@@ -5,9 +5,18 @@ from dash.dependencies import Output, Event
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly
-import random
+import time, json, urllib2
 import plotly.graph_objs as go
 from collections import deque
+
+btc = urllib2.urlopen('https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC&tsyms=USD')
+btcjson = json.load(btc)
+btclstprice = btcjson['RAW']['BTC']['USD']['PRICE']
+OPENDAY = btcjson['RAW']['BTC']['USD']['OPENDAY']
+HIGHDAY = btcjson['RAW']['BTC']['USD']['HIGHDAY']
+LASTUPDATE = btcjson['RAW']['BTC']['USD']['LASTUPDATE']
+print(HIGHDAY)
+
 
 
 
@@ -36,19 +45,10 @@ app.layout = html.Div(
 )
 def update_graph_scatter():
     try:
-        conn = sqlite3.connect('twitter.db')
-        c = conn.cursor()
+        
 
-        df = pd.read_sql("SELECT * FROM sentiment WHERE tweet LIKE '%trump%' ORDER BY unix DESC LIMIT 5000", conn)
-
-        df.sort_values('unix', inplace=True)
-
-        df['smoothed_sentiment'] = df['sentiment'].rolling(int(len(df)/5)).mean()
-
-        df.dropna(inplace=True)
-
-        x = df.unix.values[-100:]
-        y = df.smoothed_sentiment.values[-100:]
+        x = int(60)
+        y = int(60)
 
         data = plotly.graph_objs.Scatter(
             x=x,
