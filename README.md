@@ -1,12 +1,12 @@
 # sentiment analysis
 
-## Setup 
+## Setup
 
 Run `setup.py` to populate the database with tweets
 
-`pip install dash dash-renderer dash-html-components dash-core-components plotly`
+`pip install unidecode tweepy textblob dash dash-renderer dash-html-components dash-core-components plotly`
 
-to config pylint: 
+to config pylint:
 
 `pylint --generate-rcfile > .pylintrc`
 
