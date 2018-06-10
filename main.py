@@ -1,25 +1,27 @@
-import sqlite3
+import sqlite3, dash, plotly, random, datetime
 import pandas as pd 
-import dash
-from dash.dependencies import Output, Event, Input
 import dash_core_components as dcc
 import dash_html_components as html
-import plotly
-import random
 import plotly.graph_objs as go
+from dash.dependencies import Output, Event, Input
 from collections import deque
-
-
 
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [
         html.H2('Live Twitter Sentiment'),
-        dcc.Input(id='sentiment_term', value='o', type='text'),
-        dcc.Graph(id='live-graph', animate=False),
+        dcc.Input(
+            id = 'sentiment_term', 
+            value = 'o', 
+            type = 'text'
+        ),
+        dcc.Graph(
+            id = 'live-graph', 
+            animate = False
+        ),
         dcc.Interval(
-            id='graph-update',
-            interval=1*1000
+            id = 'graph-update',
+            interval = 1*1000
         ),
     ]
 )
@@ -29,7 +31,10 @@ app.layout = html.Div(
         'live-graph', 
         'figure'
     ),
-    [Input(component_id='sentiment_term', component_property='value')],
+    [Input(
+        component_id = 'sentiment_term', 
+        component_property = 'value'
+    )],
     events = [
         Event(
             'graph-update', 
@@ -48,19 +53,22 @@ def update_graph_scatter(sentiment_term):
 
         df['smoothed_sentiment'] = df['sentiment'].rolling(int(len(df)/5)).mean()
 
-        df['date'] = pd.to_datetime(df['unix'],unit='ms')
+        df['date'] = pd.to_datetime(
+            df['unix'],
+            unit='ms'
+        )
         df.set_index('date', inplace=True)
-        df = df.resample('1min').mean()
+        df = df.resample('1s').mean()
         df.dropna(inplace=True)
 
         x = df.index
         y = df.smoothed_sentiment
 
         data = plotly.graph_objs.Scatter(
-            x=x,
-            y=y,
-            name='Scatter',
-            mode= 'lines+markers'
+            x = x,
+            y = y,
+            name = 'Scatter',
+            mode = 'lines+markers'
         )
         return {
             'data': [data],
@@ -77,11 +85,13 @@ def update_graph_scatter(sentiment_term):
                         max(y)
                     ]
                 ),
-                title = '{}'.format(sentiment_term)
+                title = 'Searching for {}'.format(sentiment_term)
             )
         }
     except Exception as e:
-        with open('error.txt', 'a') as f:
+        with open('errors.txt', 'a') as f:
+            f.write(str(datetime.datetime.now()))          
+            f.write(' ')          
             f.write(str(e))
             f.write('\n')
 

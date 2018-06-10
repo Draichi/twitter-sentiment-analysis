@@ -1,2 +1,5 @@
 # database
 *.db
+*.db-journal
+/__pycache__
+errors.txt
